@@ -37,7 +37,6 @@ setup(
     include_package_data=True,
     keywords='fitchain-verifier',
     name='fitchain-verifier',
-    packages=find_packages(include=['oceandb_elasticsearch_driver']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
