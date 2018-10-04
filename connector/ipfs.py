@@ -66,17 +66,17 @@ class IPFS:
     def get_obj(self, ipfs_address):
         return self.ipfs_conn.cat(ipfs_address)
 
-    def get_remote_obj(self, meta, outfile=None, load=False):
-        """
-        Get object from IPFS as a stream of bytes and write to outfile
-        @param meta <dict>    - metadata of stuff saved to ipfs
-        @param outfile <str>  - filename to save to (optional)
-        @param load <bool>    - load into memory and return
-        @param storedas <str> - file stored as joblib|pickle|plain
+    """
+    Get object from IPFS as a stream of bytes and write to outfile
+    @param meta <dict>    - metadata of stuff saved to ipfs
+    @param outfile <str>  - filename to save to (optional)
+    @param load <bool>    - load into memory and return
+    @param storedas <str> - file stored as joblib|pickle|plain
 
-        Return: filename storing stuff
-        """
-        
+    Return: filename storing stuff
+    """
+    """
+    def get_remote_obj(self, meta, outfile=None, load=False):
         ipfs_addr = meta['ipfs_address'].decode() # FIXME is this always bytes (??)
         if 'stored_as' in meta:
             stored_as = meta['stored_as']
@@ -113,3 +113,4 @@ class IPFS:
         if stored_as == storedAs.object:
             pass
         return None
+    """
