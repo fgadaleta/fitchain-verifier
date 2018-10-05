@@ -1,11 +1,12 @@
 from eth_keys import keys, KeyAPI
-# from eth_keyfile import extract_key_from_keyfile, create_keyfile_json
 from account.ecies import encrypt, decrypt
+import logging
+
+# from eth_keyfile import extract_key_from_keyfile, create_keyfile_json
+# import datetime
 # import os, getpass
 # from argparse import ArgumentParser
 # import json
-# import datetime
-import logging
 # import rlp
 # from rlp.sedes import big_endian_int, text, Binary
 # import constants
