@@ -7,6 +7,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 class IPFS:
     """ IPFS interface to read/write assets from the fitchain network """
     def __init__(self, ipfs_config):

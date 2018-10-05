@@ -2,13 +2,13 @@ import pytest
 import os
 import inspect
 import sys
-
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0,parentdir)
-
 from connector.ipfs import IPFS
 from connector.config.ipfs_config import IPFS_CONFIG
+
+# currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.insert(0,parentdir)
+
 
 ipfs = IPFS(ipfs_config=IPFS_CONFIG['LOCAL'])
 print(ipfs)

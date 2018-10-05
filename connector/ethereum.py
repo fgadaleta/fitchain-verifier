@@ -8,6 +8,7 @@ import logging
 
 log = logging.getLogger(__name__)
 
+
 class Contract:
     def __init__(self, eth_config, abi_file):
         self.eth_config = eth_config
@@ -18,7 +19,7 @@ class Contract:
         self.contract_abi = self.__read_abi(abi_file)
         log.info('ABIs loaded successfully')
         # getting registry contract
-        self.contract_address = self.eth_config['contract_addr'] # addresses must have a checksum EIP-55
+        self.contract_address = self.eth_config['contract_addr']  # addresses must have a checksum EIP-55
         self.contract_address = Web3.toChecksumAddress(self.contract_address)
         self.contract = self.web3.eth.contract(abi=self.contract_abi,
                                                address=self.contract_address)
@@ -56,13 +57,14 @@ class VpcContract(Contract):
     """
     def __init__(self, eth_config, abi_file):
         Contract.__init__(self, eth_config, abi_file)
-        print('[Contract VPC]\t\tConnecting to Ethereum node on %s:%d...' % (self.eth_config['server'], self.eth_config['port']))
+        print('[Contract VPC]\t\tConnecting to Ethereum node on %s:%d...' %
+              (self.eth_config['server'], self.eth_config['port']))
 
     @property
     def channels(self):
         return self.contract.call().getNumberOfChannels()
 
-    def init_channel(self, model_id, k:int):
+    def init_channel(self, model_id, k: int):
         model_id = self.check_type(model_id, bytes)
         transact_params = {
             'from': self.eth_account,
@@ -103,22 +105,20 @@ class VpcContract(Contract):
         model_id, k = self.contract.call().getChannel(channel_id)
         return model_id, k
 
-    def submit_proof(self, model_id:bytes, merkleroot:bytes, sigs:list):
+    def submit_proof(self, model_id: bytes, merkleroot: bytes, sigs: list):
         model_id = self.check_type(model_id, bytes)
         merkleroot = self.check_type(merkleroot, bytes)
         sigs = [self.to_bytes(s) for s in sigs]
-
         transact_params = {
             'from': self.eth_account,
         }
-
         tx = self.contract.transact(transact_params).submitProof(model_id, merkleroot, sigs)
         return tx
 
     def nproofs(self, model_id):
         """ Return number of proofs submitted for model_id """
         model_id = self.check_type(model_id, bytes)
-        # this is faster (but we don't pay tx for this)
+        # this is faster (but we don't pay gas for this)
         # return self.contract.call().getProofCount(model_id)
         return len(self.get_proofs(model_id))
 
@@ -129,7 +129,8 @@ class VpcContract(Contract):
         proofs = {}
         for pk in proof_keys:
             proofs[pk] = {}
-            proofs[pk]['sender'], proofs[pk]['merkleroot'], proofs[pk]["sigs"] = self.contract.call().getProof(model_id, pk)
+            proofs[pk]['sender'], proofs[pk]['merkleroot'], proofs[pk]["sigs"] = \
+                self.contract.call().getProof(model_id, pk)
         return proofs
 
     def is_model_valid(self, model_id):
@@ -141,7 +142,8 @@ class VpcContract(Contract):
 class RegistryContract(Contract):
     def __init__(self, eth_config, abi_file):
         Contract.__init__(self, eth_config, abi_file)
-        print('[Contract Registry]\tConnecting to Ethereum node on %s:%d...' % (self.eth_config['server'], self.eth_config['port']))
+        print('[Contract Registry]\tConnecting to Ethereum node on %s:%d...' %
+              (self.eth_config['server'], self.eth_config['port']))
 
     @property
     def models(self):
@@ -194,7 +196,8 @@ class RegistryContract(Contract):
         and other metadata
         """
         model_id = self.check_type(model_id, bytes)
-        owner_address, ipfs_addr, stored_as, bounty, current_error, target_error, is_valid = self.contract.call().getModel(model_id)
+        owner_address, ipfs_addr, stored_as, bounty, current_error, target_error, is_valid = \
+            self.contract.call().getModel(model_id)
 
         res = {}
         res['owner_address'] = owner_address
@@ -220,10 +223,10 @@ class RegistryContract(Contract):
         # FIXME out to IPFS
         # validation_data_address, stored_as = self.__store_object(validation_data_addr, isfile)
         # address_first, address_second = IPFSAddress().to_ethereum(validation_data_address)
-        #self.fitchain_contract.call().createChallenge(model_id, address_first, address_second)
+        # self.fitchain_contract.call().createChallenge(model_id, address_first, address_second)
         # TODO capture event from createChallenge()
 
-        #self.get_transaction(self.account).createChallenge(model_id, address_first, address_second)
+        # self.get_transaction(self.account).createChallenge(model_id, address_first, address_second)
         transact_params = {
             'from': self.account,
         }

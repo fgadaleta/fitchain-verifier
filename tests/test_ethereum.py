@@ -3,15 +3,13 @@ import os
 import inspect
 import sys
 from web3 import Web3
-
-currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0,parentdir)
-
 from connector.ethereum import VpcContract, RegistryContract
 from connector.config.vpc_config import VPC_CONFIG
 from connector.config.registry_config import REG_CONFIG
 
+# currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+# parentdir = os.path.dirname(currentdir)
+# sys.path.insert(0, parentdir)
 
 # Instantiate contracts to test in the single tests
 w3 = Web3(Web3.HTTPProvider("http://localhost:8545", request_kwargs={'timeout': 60}))
