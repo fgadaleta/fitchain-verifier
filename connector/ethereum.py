@@ -7,6 +7,7 @@ import _pickle
 import logging
 
 log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 
 class Contract:
@@ -65,13 +66,28 @@ class VpcContract(Contract):
         return self.contract.call().getNumberOfChannels()
 
     def init_channel(self, model_id, k: int):
+        """Initiate channel to validate current model
+
+        Args:
+            model_id: The unique hash of the model being trained off-chain
+
+            k: the number of signatures to collect to validate this channel
+
+        Returns:
+            transaction hash if channel is initialized
+            None if no initialization occurred
+
+        Raises:
+
+        """
+
         model_id = self.check_type(model_id, bytes)
         transact_params = {
             'from': self.eth_account,
         }
         try:
             tx = self.contract.transact(transact_params).initChannel(model_id, int(k))
-        except:
+        except Exception:
             return None
         return tx
 
@@ -84,6 +100,19 @@ class VpcContract(Contract):
         return self.contract.call().getNumberRegistrants()
 
     def deposit(self, mindeposit=12000000000000000000):
+        """Method to deposit ETH to the Vpc contract in order to become a verifier for the next
+            channels
+
+            Args:
+                mindeposit: The minimum amount of ETH to become a verifier (currently set at 12)
+
+            Returns:
+                transaction hash if deposit performed successfully
+
+            Raises:
+
+        """
+
         if not self.eth_account:
             return "Set account first"
 
@@ -106,6 +135,21 @@ class VpcContract(Contract):
         return model_id, k
 
     def submit_proof(self, model_id: bytes, merkleroot: bytes, sigs: list):
+        """Method called to submit a signed proof to the VPC contract
+
+        Args:
+            model_id: The unique hash of the model this proof belongs to
+
+            merkleroot: Merkle root of the list of transactions in this proof
+
+            sigs: list of signatures that signed the transactions of this proof
+
+        Returns:
+            transaction hash if proof submitted successfully
+
+        Raises:
+        """
+
         model_id = self.check_type(model_id, bytes)
         merkleroot = self.check_type(merkleroot, bytes)
         sigs = [self.to_bytes(s) for s in sigs]
@@ -117,6 +161,7 @@ class VpcContract(Contract):
 
     def nproofs(self, model_id):
         """ Return number of proofs submitted for model_id """
+
         model_id = self.check_type(model_id, bytes)
         # this is faster (but we don't pay gas for this)
         # return self.contract.call().getProofCount(model_id)
@@ -124,6 +169,7 @@ class VpcContract(Contract):
 
     def get_proofs(self, model_id):
         """ Return: dict {proof_key} -> (sender, merkleroot, sigs) for model_id """
+
         model_id = self.check_type(model_id, bytes)
         proof_keys = self.contract.call().getProofsList(model_id)
         proofs = {}
@@ -154,31 +200,38 @@ class RegistryContract(Contract):
         return self.contract.call().getNumberOfChallenges(model_id)
 
     def create_model(self, model_id, ipfs_addr, stored_as, bounty, current_error, target_error):
+        """Method to add model to blockchain registry
+
+        Args:
+            model_id: Name of the model to submit
+
+            ipfs_addr: Unique hash of the model as stored to IPFS
+
+            stored_as: int to indicate the mode this model has been stored (currently not used)
+
+            bounty: reward of ETH assigned by model requester
+
+            current_error: current error of this model
+
+            target_error: target error of this model
+
+        Returns:
+            transaction hash if model submitted successfully
+
+        Raises:
         """
-        Add model to blockchain registry
-        @param model filename where model is stored (pickle) """
 
         # FIXME bring this out
-        """
-        model_id, stored_as = self.__store_object(model, isfile)
-        ipfs_addr_first, ipfs_addr_second = IPFSAddress().to_ethereum(model_id)
-        print('DEBUG from createModel():', model_id, ipfs_addr_first, ipfs_addr_second)
-        """
+        # model_id, stored_as = self.__store_object(model, isfile)
+        # ipfs_addr_first, ipfs_addr_second = IPFSAddress().to_ethereum(model_id)
+        # print('DEBUG from createModel():', model_id, ipfs_addr_first, ipfs_addr_second)
+
         model_id = self.check_type(model_id, bytes)
         ipfs_addr = self.check_type(ipfs_addr, bytes)
         stored_as = int(stored_as)
         bounty = int(bounty)
         current_error = int(current_error)
         target_error = int(target_error)
-        """
-        res = self.contract.call().createModel(model_id,
-                                               ipfs_addr,
-                                               stored_as,
-                                               bounty,
-                                               current_error,
-                                               target_error)
-        print('DEBUG from createModel()', res)
-        """
         transact_params = {
             'from': self.account
         }
@@ -210,13 +263,18 @@ class RegistryContract(Contract):
         return res
 
     def create_challenge(self, model_id, validation_data_addr, isfile=False, file_format='pickle', verbose=False):
+        """Method to create challenge for model_id
+
+        Args:
+            model_id: Unique identifier of the model to submit a challenge for
+            validation_data_addr: location where validation dataset is stored
+
+        Returns:
+            transaction hash if model submitted successfully
+
+        Raises:
         """
-        Create challenge for model_id
-        @params model_id <str> - model unique identifier
-        @params validation_data_addr <file> - filename where validset is stored
-        @params isfile <boolean> - must be True for files
-        @params file_format <string> - pickle | txt | custom schema provided as a dict
-        """
+
         model_id = self.check_type(model_id, bytes)
         validation_data_addr = self.check_type(validation_data_addr, bytes)
 
@@ -225,7 +283,6 @@ class RegistryContract(Contract):
         # address_first, address_second = IPFSAddress().to_ethereum(validation_data_address)
         # self.fitchain_contract.call().createChallenge(model_id, address_first, address_second)
         # TODO capture event from createChallenge()
-
         # self.get_transaction(self.account).createChallenge(model_id, address_first, address_second)
         transact_params = {
             'from': self.account,

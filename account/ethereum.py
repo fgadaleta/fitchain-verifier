@@ -2,16 +2,13 @@ from eth_keys import keys, KeyAPI
 from account.ecies import encrypt, decrypt
 import logging
 
-# from eth_keyfile import extract_key_from_keyfile, create_keyfile_json
-# import datetime
-# import os, getpass
-# from argparse import ArgumentParser
-# import json
+
 # import rlp
 # from rlp.sedes import big_endian_int, text, Binary
 # import constants
 
 log = logging.getLogger(__name__)
+log.setLevel(logging.DEBUG)
 
 class Account:
 
@@ -24,10 +21,41 @@ class Account:
     def __str__(self):
          return self.privkey.public_key.to_hex()
 
-    def encrypt(self, message):
+    @property
+    def public_key(self):
+        return self.privkey.public_key.to_bytes()
+
+    def encrypt(self, message, dest_public_key=None):
+        """Encrypt with this pubkey or the pubkey of another account
+
+        Args:
+            message: The message to encrypt (plaintext)
+            dest_public_key: The public key to encrypt the message with
+
+        Returns:
+            Bytes of the encrypted message.
+
+        Raises:
+            EncryptionError
+        """
+
+        if dest_public_key:
+            return encrypt(message, dest_public_key)
         return encrypt(message, self.privkey.public_key)
 
     def decrypt(self, enc_message):
+        """Decrypt the encrypted message with the private key of this Account
+
+        Args:
+            enc_message: The encrypted message to decrypt (cyphertext)
+
+        Returns:
+            Bytes of the plaintext message.
+
+        Raises:
+            DecryptionError
+        """
+
         return decrypt(enc_message, self.privkey)
 
     def sign(self, message: bytes)->bytes:
@@ -35,12 +63,14 @@ class Account:
 
     def verify_sig_msg(self, message: bytes, signature: bytes, pubkey: bytes):
         """ Verifies that message has been signed by pubkey """
+
         public_key = KeyAPI.PublicKey(pubkey)
         signature = KeyAPI.Signature(signature)
         return signature.verify_msg(message, public_key)
 
     def extract_pubkey_from_signature(self, message: bytes, signature: bytes):
         """ Recover pubkey that signed message """
+
         signature = KeyAPI.Signature(signature)
         recovered_pk = signature.recover_public_key_from_msg(message)
         return recovered_pk
@@ -49,6 +79,21 @@ class Account:
         public_key = KeyAPI.PublicKey(pubkey)
         signature = KeyAPI.Signature(signature)
         return signature.verify_msg_hash(msg_hash, public_key)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -90,57 +135,5 @@ class Account: #(rlp.Serializable):
         print('public_key=', self.public_key, type(self.public_key))
         print('address', self.address, type(self.address))
         # convert and keep private_key, public_key, signature in to_bytes()
-
-"""
-
-
-
-"""
-
-if __name__ == "__main__":
-    parser = ArgumentParser()
-    # Add more options if you like
-    parser.add_argument("-k", "--keyfile", dest="keyfilePath",
-                        help="Ethereum keystore file", metavar="FILE")
-
-
-    parser.add_argument("-p", "--password",
-                        action="store_false", dest="password", default=True,
-                        help="Ethereum account password")
-
-    args = parser.parse_args()
-    print('Ethereum keyfile', args.keyfilePath)
-    if not os.path.exists(args.keyfilePath):
-        parser.error("The file %s does not exist!" % args.keyfilePath)
-
-    password = getpass.getpass()
-    account = Account(keyfile=args.keyfilePath,
-                      password=password,
-                      private_key=None)
-
-    signature = account.sign('hello world')
-    print('signature=', signature, type(signature))
-    print('valid=', verify('hello world', signature,account.public_key.to_bytes()))
-
-    # encrypt without providing a key, use this account key
-    enc_mes = account.encrypt('hello dick')
-    print('encypted=', enc_mes)
-
-    # encrypt providing the public key of another account (as bytes)
-    enc_mes = account.encrypt('hello dick', account.public_key.to_bytes())
-    print('encypted=', enc_mes)
-    print('dec_mes=', account.decrypt(enc_mes))
-
-    print('pubkey',account.public_key.to_bytes(),len(account.public_key.to_bytes()))
-    pk_hex = account.public_key.to_bytes().hex()
-    print('is_equal', bytes.fromhex(pk_hex))
-
-    print('signature', signature)
-    sig_hex = signature.hex()
-    print('is_equal', bytes.fromhex(sig_hex))
-
-    valid = verify('hello world', bytes.fromhex(sig_hex), bytes.fromhex(pk_hex))
-    print('transaction valid', valid)
-
 
 """

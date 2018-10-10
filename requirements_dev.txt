@@ -1,2 +1,1 @@
-Check environment as described in
-https://github.com/fgadaleta/python-stuff/tree/master/conda
+json-rpc
