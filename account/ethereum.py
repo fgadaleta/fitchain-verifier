@@ -2,11 +2,6 @@ from eth_keys import keys, KeyAPI
 from account.ecies import encrypt, decrypt
 import logging
 
-
-# import rlp
-# from rlp.sedes import big_endian_int, text, Binary
-# import constants
-
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
@@ -65,20 +60,20 @@ class Account:
         """ Verifies that message has been signed by pubkey """
 
         public_key = KeyAPI.PublicKey(pubkey)
-        signature = KeyAPI.Signature(signature)
-        return signature.verify_msg(message, public_key)
+        sig = KeyAPI.Signature(signature)
+        return sig.verify_msg(message, public_key)
 
     def extract_pubkey_from_signature(self, message: bytes, signature: bytes):
         """ Recover pubkey that signed message """
 
-        signature = KeyAPI.Signature(signature)
-        recovered_pk = signature.recover_public_key_from_msg(message)
+        sig = KeyAPI.Signature(signature)
+        recovered_pk = sig.recover_public_key_from_msg(message)
         return recovered_pk
 
     def verify_sig_msg_hash(self, msg_hash: bytes, signature: bytes, pubkey: bytes):
         public_key = KeyAPI.PublicKey(pubkey)
-        signature = KeyAPI.Signature(signature)
-        return signature.verify_msg_hash(msg_hash, public_key)
+        sig = KeyAPI.Signature(signature)
+        return sig.verify_msg_hash(msg_hash, public_key)
 
 
 

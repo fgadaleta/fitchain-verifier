@@ -1,14 +1,14 @@
 import pytest
-import os
-import inspect
-import sys
+# import os
+# import inspect
+# import sys
 
 from account.ethereum import Account
 
 
 def test_sign_verify():
     # load private key from disk to account
-    pk_from_disk = b'\xb3\x07\xae\x02&\x00g \xa8\xf5w*O.|\x8a\xae\xb1\xf3\xf6\xf7op\x90>\xad\xdfo\x1e:\xd0\x16'
+    pk_from_disk = bytes.fromhex('4f3edf983ac636a65a842ce7c78d9aa706d3b113bce9c46f30d7d21715b23b1d')
     verifier = Account(pk_from_disk)
     message = b"hello world!"
     print('Verifier ', verifier)
@@ -27,4 +27,5 @@ def test_sign_verify():
     pub_key = verifier.extract_pubkey_from_signature(message, sig.to_bytes())
     print('Recovered pub_key ', pub_key)
     is_valid = verifier.verify_sig_msg(message, sig.to_bytes(), pub_key.to_bytes())
+    # assert 0
     assert is_valid == True

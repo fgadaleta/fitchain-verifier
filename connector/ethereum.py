@@ -150,13 +150,20 @@ class VpcContract(Contract):
         Raises:
         """
 
-        model_id = self.check_type(model_id, bytes)
-        merkleroot = self.check_type(merkleroot, bytes)
-        sigs = [self.to_bytes(s) for s in sigs]
+        # convert arguments to hex befor submitting to contract
+        model_id = self.check_type(model_id, bytes).hex()
+        merkleroot = self.check_type(merkleroot, bytes).hex()
+        sigs = [s.hex() for s in sigs]
+
+        log.debug('model_id=%s type=%s', model_id, type(model_id))
+        log.debug('merkleroot=%s type=%s', merkleroot, type(merkleroot))
+        log.debug('sigs=%s type=%s', sigs, type(sigs))
+        
         transact_params = {
             'from': self.eth_account,
         }
         tx = self.contract.transact(transact_params).submitProof(model_id, merkleroot, sigs)
+        print("from submit_proof tx=", tx.hex())
         return tx
 
     def nproofs(self, model_id):
@@ -172,11 +179,16 @@ class VpcContract(Contract):
 
         model_id = self.check_type(model_id, bytes)
         proof_keys = self.contract.call().getProofsList(model_id)
+        proof_keys = [k.hex() for k in proof_keys]
         proofs = {}
+        
         for pk in proof_keys:
+            sender, merkleroot, sigs = self.contract.call().getProof(model_id, pk)
+            merkleroot = merkleroot.hex()
+            sigs = [s.hex() for s in sigs]
+            # create return dictionary
             proofs[pk] = {}
-            proofs[pk]['sender'], proofs[pk]['merkleroot'], proofs[pk]["sigs"] = \
-                self.contract.call().getProof(model_id, pk)
+            proofs[pk]['sender'], proofs[pk]['merkleroot'], proofs[pk]["sigs"] = sender, merkleroot, sigs
         return proofs
 
     def is_model_valid(self, model_id):

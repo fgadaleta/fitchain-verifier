@@ -35,6 +35,14 @@ The _fitchain verifier_ provides an interface (Python) to the smart contracts of
 
 You should have running *geth* or *ganache-cli* (for testing local blockchain) and IPFS daemon.
 
+### WARNING
+
+In order to keep the same configuration and the same addresses for contracts and accounts, run ganache in deterministic
+mode with
+
+` $ ganache-cli -d 42 `
+
+
 ## Quickstart
 
 `$ pytest tests`
