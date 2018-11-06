@@ -74,8 +74,11 @@ def test_submit_proof():
     model_id = b'0x0001cd34fdsefg'
     merkleroot = b'000merkleroot001'
     sigs = [b'sig1', b'sig2', b'sig3']
-    sp_tx = vpc.submit_proof(model_id=model_id, merkleroot=merkleroot, sigs=sigs)
-    print("from test_submit_proof tx=", sp_tx.hex())
+
+    for sig in sigs:
+        sp_tx = vpc.submit_proof(model_id=model_id, merkleroot=merkleroot, sig)
+        # sp_tx = vpc.submit_proof(model_id=model_id, merkleroot=merkleroot, sigs=sigs)
+        print("from test_submit_proof tx=", sp_tx.hex())
 
     nproofs = vpc.nproofs(model_id)
     print("There are %s proofs for model %s " % (nproofs, model_id.hex()))

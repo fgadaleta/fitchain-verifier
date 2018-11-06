@@ -1,7 +1,4 @@
 import pytest
-# import os
-# import inspect
-# import sys
 from connector.ipfs import IPFS
 from connector.config.ipfs_config import IPFS_CONFIG
 
