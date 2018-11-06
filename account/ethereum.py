@@ -1,6 +1,7 @@
 from eth_keys import keys, KeyAPI
 from account.ecies import encrypt, decrypt
 import logging
+import sha3
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -20,6 +21,11 @@ class Account:
     def public_key(self):
         return self.privkey.public_key.to_bytes()
 
+    def hash(self, message: bytes):
+        keccak = sha3.keccak_256()
+        keccak.update(message)
+        return keccak.hexdigest()
+        
     def encrypt(self, message, dest_public_key=None):
         """Encrypt with this pubkey or the pubkey of another account
 
