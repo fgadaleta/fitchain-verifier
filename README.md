@@ -5,8 +5,6 @@
 >    🐳  [Description of repo](https://www.elastic.co/) component for (Python).
 >    [fitchain.io](https://fitchain.io)
 
-TODO Change this to match the repo name and testing environments
-
 [![Travis (.com)](https://img.shields.io/travis/com/oceanprotocol/oceandb-elasticsearch-driver.svg)](https://travis-ci.com/oceanprotocol/oceandb-elasticsearch-driver)
 [![Codacy coverage](https://img.shields.io/codacy/coverage/de067a9402c64b989c76b27cfc74fefe.svg)](https://app.codacy.com/project/ocean-protocol/oceandb-elasticsearch-driver/dashboard)
 [![PyPI](https://img.shields.io/pypi/v/oceandb-elasticsearch-driver.svg)](https://pypi.org/project/oceandb-elasticsearch-driver/)
@@ -45,7 +43,66 @@ mode with
 
 ## Quickstart
 
-`$ pytest tests`
+Mimic compute provider training machine learning model 
+
+```
+$ python train_model.py
+$ ipfs add model_params.h5
+added QmZFwmSaniaqGaw8r7PxYDBkkoTUbTibSsDpRetRrBFMKi model_params.h5
+```
+
+Create model_schema.json
+
+```
+{
+  "uuid": "0x0123456789",
+  "type": "keras",
+  "input_signature": "hgGDH7843hjds",
+  "stored_as": "file",
+  "format": "h5",
+  "location" :
+    {
+      "provider": "ipfs",
+      "endpoint": "QmZFwmSaniaqGaw8r7PxYDBkkoTUbTibSsDpRetRrBFMKi"
+    }
+}
+```
+
+Mimic curator submitting testing data
+
+```
+$ cd example
+$ ipfs add test.csv
+added QmWVZ87MXAwt5wvgsM9akHUnGE5K3SRSKMmkQtPXRsrPUk test.csv
+```
+
+Create data_schema.json
+```
+{
+  "uuid": "0x0123456789",
+  "type": "collection",
+  "input_signature": "hgGDH7843hjds",
+  "format": "csv",
+  "location" :
+      {
+        "provider": "ipfs",
+        "endpoint": "QmWVZ87MXAwt5wvgsM9akHUnGE5K3SRSKMmkQtPXRsrPUk"
+      }
+}
+```
+
+Mimic consumer creates a model challenge with both schemas
+
+TBD
+
+
+Mimic verifier performing model verification
+
+```
+$ wget model_schema.json
+$ wget data_schema.json
+$ python verify.py --model example/model_schema.json --data example/data_schema.json 
+```
 
 
 ## Environment variables
@@ -56,6 +113,28 @@ IPFS can be configured from `connector/config/ipfs_config.py`
 
 
 ## Sample use case
+
+Prior to model verification, a number of actors cooperate to create such a model. Specifically at least one data provider, one model provider, one compute provider and assigned gossipers are required for such a task.
+Below are the four essential steps required by each actor to create a new model asset.
+
+### Step 1 
+Data Provider owns the csv file (eg. `example/train.csv`) where the original training data is stored
+
+### Step 2
+Model Provider owns the algorithm (eg. as in `example/train_model.py`) 
+
+### Step 3
+Compute provider (for this use case == Data Provider) performs model training by using keras/Tensorflow (or any available machine learning library). As an example one can train the neural network in `example/train_model.py` by launching `$ python train_model.py`
+
+After model is trained, it is exported to the local filesystem of the compute provider (eg. `example/model_params.h5`) and stored to IPFS with something like `$ ipfs add example/model_params.h5` (it is possible to save directly to IPFS without storing the model to local filesystem)
+
+#### Step 4
+A model verifier who is in possession of testing data (eg. `example/test.csv`), can fetch the model from IPFS 
+and perform off-chain verification launching script `$ python verify_model.py`
+
+Verification output can be written to fitchain smart contract together with verifier signature and address.
+
+(WORK IN PROGRESS)
 
 ### Compute provider
 Compute provider trains an image classifier on a private dataset and stores the trained model to IPFS
