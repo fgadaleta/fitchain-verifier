@@ -1,0 +1,11 @@
+{
+  "uuid": "0x0123456789",
+  "type": "collection",
+  "input_signature": "hgGDH7843hjds",
+  "format": "csv",
+  "location" :
+      {
+        "provider": "ipfs",
+        "endpoint": "QmWVZ87MXAwt5wvgsM9akHUnGE5K3SRSKMmkQtPXRsrPUk"
+      }
+}

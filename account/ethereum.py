@@ -6,8 +6,8 @@ import sha3
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
 
-class Account:
 
+class Account:
     def __init__(self, private_key: bytes):
         self.privkey = KeyAPI.PrivateKey(private_key)
 
@@ -15,17 +15,21 @@ class Account:
         return self.privkey.public_key.to_hex()
 
     def __str__(self):
-         return self.privkey.public_key.to_hex()
+        return self.privkey.public_key.to_hex()
 
     @property
     def public_key(self):
-        return self.privkey.public_key.to_bytes()
+        return self.privkey.public_key
+
+    @property
+    def address(self):
+        return self.public_key.to_address()
 
     def hash(self, message: bytes):
         keccak = sha3.keccak_256()
         keccak.update(message)
         return keccak.hexdigest()
-        
+
     def encrypt(self, message, dest_public_key=None):
         """Encrypt with this pubkey or the pubkey of another account
 
@@ -80,61 +84,3 @@ class Account:
         public_key = KeyAPI.PublicKey(pubkey)
         sig = KeyAPI.Signature(signature)
         return sig.verify_msg_hash(msg_hash, public_key)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-"""
-class Account: #(rlp.Serializable):
-    def __init__(self, keyfile=None, password=None, private_key=None, path='./'):
-        if isinstance(password, str):
-            password = password.encode()
-
-        # create new account if none given
-        if all(p is None for p in [keyfile, private_key]):
-            private_key = os.urandom(32)
-            if password is None:
-                password = os.urandom(10)
-
-            if len(password):
-                print('-'*15, 'Save this password somewhere', '-'*15)
-                print('<', password.hex(), '>')
-                print('-'*58)
-            else:
-                print('-'*5, '<empty password>', '-'*5)
-
-            keyfile_data = create_keyfile_json(private_key, password)
-            #filename = 'keyfile--'+keyfile_data['address']
-            filename = os.path.join(path, 'keyfile--'+keyfile_data['address'])
-            with open(filename, 'w') as file:
-                file.write(json.dumps(keyfile_data))
-
-        # load account from existing keyfile
-        else:
-            if private_key is None:
-                private_key = extract_key_from_keyfile(keyfile, password)
-
-        # init stuff for this account
-        self.private_key = KeyAPI.PrivateKey(private_key)
-        self.public_key  = keys.PublicKey.from_private(self.private_key)
-        self.address = self.public_key.to_address()
-        self.nonce = 0
-        print('public_key=', self.public_key, type(self.public_key))
-        print('address', self.address, type(self.address))
-        # convert and keep private_key, public_key, signature in to_bytes()
-
-"""

@@ -72,8 +72,12 @@ def test_create_model():
 
 def test_submit_proof():
     model_id = b'0x0001cd34fdsefg'
+    service_id = b'from_ocean_service_id'
     merkleroot = b'000merkleroot001'
     sigs = [b'sig1', b'sig2', b'sig3']
+
+    # submit_proof(service_id, model_id, merkleroot, tx_eot, sig, sender_addr)
+    # bytes32, bytes32, string, string, bytes, address
 
     for sig in sigs:
         sp_tx = vpc.submit_proof(model_id=model_id, merkleroot=merkleroot, sig)

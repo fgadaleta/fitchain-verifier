@@ -1,0 +1,12 @@
+{
+  "uuid": "0x0123456789",
+  "type": "keras",
+  "input_signature": "hgGDH7843hjds",
+  "stored_as": "file",
+  "format": "h5",
+  "location" :
+    {
+      "provider": "ipfs",
+      "endpoint": "QmZFwmSaniaqGaw8r7PxYDBkkoTUbTibSsDpRetRrBFMKi"
+    }
+}
