@@ -41,7 +41,8 @@ mode with
 ` $ ganache-cli -d 42 `
 
 
-## Quickstart
+## [Quickstart](#quickstart)
+
 
 Mimic compute provider training machine learning model 
 
